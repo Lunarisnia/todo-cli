@@ -22,8 +22,9 @@ func PromptGetInput(pc PromptContent, optional bool) string {
 	}
 
 	prompt := promptui.Prompt{
-		Label:    pc.Label,
-		Validate: validate,
+		Label:       pc.Label,
+		Validate:    validate,
+		HideEntered: true,
 	}
 
 	result, err := prompt.Run()
