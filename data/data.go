@@ -35,3 +35,14 @@ func MigrateDatabase() {
 	}
 	log.Println("Database initiated")
 }
+
+func InsertTodo(title string, status bool) {
+	todo := Todo{Title: title, Status: status}
+	if err := db.Create(&todo).Error; err != nil {
+		log.Fatalln(`
+==========================
+Have you ran "todo init"?
+==========================
+		`)
+	}
+}
