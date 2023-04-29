@@ -20,14 +20,13 @@ var listCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		todos := data.ReadAllTodos(showEverything)
 
-		// TODO: add pagination
-		// TODO: Modify the cursor icon
-		// TODO: Change the ongoing text color to red and done to green
+		// TODO: add feature to mark a todo list to completed
+		// I'm thinking of taking the value from this and running another prompt directly to ask if you want to mark it done?
 		templates := promptui.SelectTemplates{
 			Label:    "{{ . }}?",
-			Active:   "\U0001F336 {{ .Title | cyan }}",
-			Inactive: "  {{ .Title | cyan }}",
-			Selected: "\U0001F336 {{ .Title | red | cyan }}",
+			Active:   "🟢 {{ if .Status }} {{ .Title | green }} {{ else }} {{ .Title | red }} {{ end }}",
+			Inactive: "  {{ if .Status }} {{ .Title | green }} {{ else }} {{ .Title | red }} {{ end }}",
+			Selected: "🟢 {{ if .Status }} {{ .Title | green }} {{ else }} {{ .Title | red }} {{ end }}",
 			Details: `
 ----------- Details -----------
 {{ "Title:" | faint }}  {{ .Title }}
