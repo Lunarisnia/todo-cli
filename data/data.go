@@ -60,6 +60,32 @@ func ReadAllTodos(everything bool) []Todo {
 	return todos
 }
 
+func FindOneTodo(todoID string) Todo {
+	todo := Todo{}
+	if err := db.Where("id = ?", todoID).First(&todo).Error; err != nil {
+		remindInit()
+	}
+	return todo
+}
+
+func MarkTodoAsDone(todo *Todo) {
+	if err := db.Model(todo).Update("status", true).Error; err != nil {
+		remindInit()
+	}
+}
+
+func MarkTodoAsNotDone(todo *Todo) {
+	if err := db.Model(todo).Update("status", false).Error; err != nil {
+		remindInit()
+	}
+}
+
+func DeleteTodo(todo *Todo) {
+	if err := db.Delete(todo).Error; err != nil {
+		remindInit()
+	}
+}
+
 func remindInit() {
 	log.Fatalln(`
 ==========================

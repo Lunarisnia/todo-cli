@@ -4,6 +4,9 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/lunarisnia/todo-cli/data"
 	"github.com/lunarisnia/todo-cli/prompt"
 	"github.com/manifoldco/promptui"
@@ -20,8 +23,6 @@ var listCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		todos := data.ReadAllTodos(showEverything)
 
-		// TODO: add feature to mark a todo list to completed
-		// I'm thinking of taking the value from this and running another prompt directly to ask if you want to mark it done?
 		templates := promptui.SelectTemplates{
 			Label:    "{{ . }}?",
 			Active:   "🟢 {{ if .Status }} {{ .Title | green }} {{ else }} {{ .Title | red }} {{ end }}",
@@ -31,19 +32,65 @@ var listCmd = &cobra.Command{
 ----------- Details -----------
 {{ "Title:" | faint }}  {{ .Title }}
 {{ "Description:" | faint }}  {{ .Description }}
-{{ "Status:" | faint }}  {{ if .Status }} {{ "✅" }} {{ else }} {{ "❌" }} {{ end }}
+{{ "Status:" | faint }}  {{ if .Status }} {{ "✅ Done" }} {{ else }} {{ "❌ Work In Progress" }} {{ end }}
 `,
 		}
 
-		sc := prompt.SelectContent{
+		todoSc := prompt.SelectContent{
 			Label:     "Your Todo List",
-			Items:     todos,
+			Items:     []interface{}{todos},
 			Templates: &templates,
 		}
-		prompt.PromptSelectContent(&sc)
+		_, selectedTodo := prompt.PromptSelectContent(&todoSc)
 
+		todoID := fetchTodoID(selectedTodo)
+
+		todo := data.FindOneTodo(todoID)
+
+		var items []string
+
+		if todo.Status {
+			items = []string{"Mark As Not Done", "Delete"}
+		} else {
+			items = []string{"Mark As Done", "Delete"}
+		}
+		actionSc := prompt.SelectContent{
+			Label:     fmt.Sprintf("Choose An Action for %v", todo.Title),
+			Items:     []interface{}{items},
+			Templates: nil,
+		}
+		_, selectedAction := prompt.PromptSelectContent(&actionSc)
+
+		switch selectedAction {
+		case "Mark As Done":
+			data.MarkTodoAsDone(&todo)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), todo.Title)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), "Marked as done")
+		case "Mark As Not Done":
+			data.MarkTodoAsNotDone(&todo)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), todo.Title)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), "Marked as not done")
+		case "Delete":
+			data.DeleteTodo(&todo)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), todo.Title)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), "Deleted")
+		default:
+			fmt.Fprintln(cmd.OutOrStdout(), "How the hell does it went here?")
+		}
 		return nil
 	},
+}
+
+func fetchTodoID(s string) string {
+	dirtyID := strings.Split(s, " ")[0]
+
+	return dirtyID[2:]
 }
 
 func init() {
