@@ -80,6 +80,12 @@ func MarkTodoAsNotDone(todo *Todo) {
 	}
 }
 
+func DeleteTodo(todo *Todo) {
+	if err := db.Delete(todo).Error; err != nil {
+		remindInit()
+	}
+}
+
 func remindInit() {
 	log.Fatalln(`
 ==========================

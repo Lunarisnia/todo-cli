@@ -23,8 +23,6 @@ var listCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		todos := data.ReadAllTodos(showEverything)
 
-		// TODO: add feature to mark a todo list to completed
-		// I'm thinking of taking the value from this and running another prompt directly to ask if you want to mark it done?
 		templates := promptui.SelectTemplates{
 			Label:    "{{ . }}?",
 			Active:   "🟢 {{ if .Status }} {{ .Title | green }} {{ else }} {{ .Title | red }} {{ end }}",
@@ -77,7 +75,10 @@ var listCmd = &cobra.Command{
 			fmt.Fprintln(cmd.OutOrStdout(), "======================")
 			fmt.Fprintln(cmd.OutOrStdout(), "Marked as not done")
 		case "Delete":
-			// TODO: Delete the todo
+			data.DeleteTodo(&todo)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), todo.Title)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
 			fmt.Fprintln(cmd.OutOrStdout(), "Deleted")
 		default:
 			fmt.Fprintln(cmd.OutOrStdout(), "How the hell does it went here?")
