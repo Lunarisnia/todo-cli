@@ -11,12 +11,16 @@ import (
 type PromptContent struct {
 	ErrorMessage string
 	Label        string
+	MaxChar      int
 }
 
 func PromptGetInput(pc PromptContent, optional bool) string {
 	validate := func(input string) error {
 		if !optional && (input == "") {
 			return errors.New(pc.ErrorMessage)
+		}
+		if len(input) > pc.MaxChar {
+			return fmt.Errorf("text is too long. max: %v; current: %v", pc.MaxChar, len(input))
 		}
 		return nil
 	}

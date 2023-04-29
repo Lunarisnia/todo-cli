@@ -20,10 +20,12 @@ var createCmd = &cobra.Command{
 		todoTitlePc := prompt.PromptContent{
 			ErrorMessage: "title is invalid",
 			Label:        "Title",
+			MaxChar:      125,
 		}
 		todoDescPc := prompt.PromptContent{
 			ErrorMessage: "description is invalid",
 			Label:        "Description",
+			MaxChar:      150,
 		}
 
 		title := prompt.PromptGetInput(todoTitlePc, false)
