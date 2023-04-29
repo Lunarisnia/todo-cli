@@ -4,8 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/lunarisnia/todo-cli/data"
 	"github.com/lunarisnia/todo-cli/prompt"
 	"github.com/spf13/cobra"
@@ -28,7 +26,6 @@ var createCmd = &cobra.Command{
 
 		title := prompt.PromptGetInput(todoTitlePc, false)
 		description := prompt.PromptGetInput(todoDescPc, true)
-		fmt.Fprint(cmd.OutOrStdout(), title)
 		data.InsertTodo(title, description, false)
 		return nil
 	},
