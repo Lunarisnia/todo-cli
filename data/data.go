@@ -68,6 +68,18 @@ func FindOneTodo(todoID string) Todo {
 	return todo
 }
 
+func MarkTodoAsDone(todo *Todo) {
+	if err := db.Model(todo).Update("status", true).Error; err != nil {
+		remindInit()
+	}
+}
+
+func MarkTodoAsNotDone(todo *Todo) {
+	if err := db.Model(todo).Update("status", false).Error; err != nil {
+		remindInit()
+	}
+}
+
 func remindInit() {
 	log.Fatalln(`
 ==========================

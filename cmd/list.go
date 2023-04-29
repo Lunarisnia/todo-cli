@@ -34,7 +34,7 @@ var listCmd = &cobra.Command{
 ----------- Details -----------
 {{ "Title:" | faint }}  {{ .Title }}
 {{ "Description:" | faint }}  {{ .Description }}
-{{ "Status:" | faint }}  {{ if .Status }} {{ "✅" }} {{ else }} {{ "❌" }} {{ end }}
+{{ "Status:" | faint }}  {{ if .Status }} {{ "✅ Done" }} {{ else }} {{ "❌ Work In Progress" }} {{ end }}
 `,
 		}
 
@@ -48,18 +48,35 @@ var listCmd = &cobra.Command{
 		todoID := fetchTodoID(selectedTodo)
 
 		todo := data.FindOneTodo(todoID)
+
+		var items []string
+
+		if todo.Status {
+			items = []string{"Mark As Not Done", "Delete"}
+		} else {
+			items = []string{"Mark As Done", "Delete"}
+		}
 		actionSc := prompt.SelectContent{
 			Label:     fmt.Sprintf("Choose An Action for %v", todo.Title),
-			Items:     []interface{}{[]string{"Mark as done", "Delete"}},
+			Items:     []interface{}{items},
 			Templates: nil,
 		}
-		selectedAction, _ := prompt.PromptSelectContent(&actionSc)
+		_, selectedAction := prompt.PromptSelectContent(&actionSc)
 
 		switch selectedAction {
-		case 0:
-			// TODO: Update the todo status
+		case "Mark As Done":
+			data.MarkTodoAsDone(&todo)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), todo.Title)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
 			fmt.Fprintln(cmd.OutOrStdout(), "Marked as done")
-		case 1:
+		case "Mark As Not Done":
+			data.MarkTodoAsNotDone(&todo)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), todo.Title)
+			fmt.Fprintln(cmd.OutOrStdout(), "======================")
+			fmt.Fprintln(cmd.OutOrStdout(), "Marked as not done")
+		case "Delete":
 			// TODO: Delete the todo
 			fmt.Fprintln(cmd.OutOrStdout(), "Deleted")
 		default:
