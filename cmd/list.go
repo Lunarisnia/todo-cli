@@ -6,6 +6,7 @@ package cmd
 import (
 	"github.com/lunarisnia/todo-cli/data"
 	"github.com/lunarisnia/todo-cli/prompt"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -17,16 +18,28 @@ var listCmd = &cobra.Command{
 	Short: "Show all todo list",
 	Long:  `Show all todo list`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		todos := data.ReadAllTodos(false)
-		items := make([]string, len(todos))
+		todos := data.ReadAllTodos(showEverything)
 
-		for i, todo := range todos {
-			items[i] = todo.Title
+		// TODO: add pagination
+		// TODO: Modify the cursor icon
+		// TODO: Change the ongoing text color to red and done to green
+		templates := promptui.SelectTemplates{
+			Label:    "{{ . }}?",
+			Active:   "\U0001F336 {{ .Title | cyan }}",
+			Inactive: "  {{ .Title | cyan }}",
+			Selected: "\U0001F336 {{ .Title | red | cyan }}",
+			Details: `
+----------- Details -----------
+{{ "Title:" | faint }}  {{ .Title }}
+{{ "Description:" | faint }}  {{ .Description }}
+{{ "Status:" | faint }}  {{ if .Status }} {{ "✅" }} {{ else }} {{ "❌" }} {{ end }}
+`,
 		}
 
 		sc := prompt.SelectContent{
-			Label: "Your Todo List",
-			Items: items,
+			Label:     "Your Todo List",
+			Items:     todos,
+			Templates: &templates,
 		}
 		prompt.PromptSelectContent(&sc)
 
