@@ -40,10 +40,30 @@ func MigrateDatabase() {
 func InsertTodo(title string, description string, status bool) {
 	todo := Todo{Title: title, Description: description, Status: status}
 	if err := db.Create(&todo).Error; err != nil {
-		log.Fatalln(`
+		remindInit()
+	}
+}
+
+func ReadAllTodos(everything bool) []Todo {
+	todos := []Todo{}
+
+	if everything {
+		if err := db.Find(&todos).Error; err != nil {
+			remindInit()
+		}
+		return todos
+	}
+
+	if err := db.Where("status = 0").Find(&todos).Error; err != nil {
+		remindInit()
+	}
+	return todos
+}
+
+func remindInit() {
+	log.Fatalln(`
 ==========================
 Have you ran "todo init"?
 ==========================
-		`)
-	}
+	`)
 }
