@@ -60,6 +60,14 @@ func ReadAllTodos(everything bool) []Todo {
 	return todos
 }
 
+func FindOneTodo(todoID string) Todo {
+	todo := Todo{}
+	if err := db.Where("id = ?", todoID).First(&todo).Error; err != nil {
+		remindInit()
+	}
+	return todo
+}
+
 func remindInit() {
 	log.Fatalln(`
 ==========================

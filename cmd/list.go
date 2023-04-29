@@ -4,6 +4,9 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/lunarisnia/todo-cli/data"
 	"github.com/lunarisnia/todo-cli/prompt"
 	"github.com/manifoldco/promptui"
@@ -35,15 +38,41 @@ var listCmd = &cobra.Command{
 `,
 		}
 
-		sc := prompt.SelectContent{
+		todoSc := prompt.SelectContent{
 			Label:     "Your Todo List",
-			Items:     todos,
+			Items:     []interface{}{todos},
 			Templates: &templates,
 		}
-		prompt.PromptSelectContent(&sc)
+		_, selectedTodo := prompt.PromptSelectContent(&todoSc)
 
+		todoID := fetchTodoID(selectedTodo)
+
+		todo := data.FindOneTodo(todoID)
+		actionSc := prompt.SelectContent{
+			Label:     fmt.Sprintf("Choose An Action for %v", todo.Title),
+			Items:     []interface{}{[]string{"Mark as done", "Delete"}},
+			Templates: nil,
+		}
+		selectedAction, _ := prompt.PromptSelectContent(&actionSc)
+
+		switch selectedAction {
+		case 0:
+			// TODO: Update the todo status
+			fmt.Fprintln(cmd.OutOrStdout(), "Marked as done")
+		case 1:
+			// TODO: Delete the todo
+			fmt.Fprintln(cmd.OutOrStdout(), "Deleted")
+		default:
+			fmt.Fprintln(cmd.OutOrStdout(), "How the hell does it went here?")
+		}
 		return nil
 	},
+}
+
+func fetchTodoID(s string) string {
+	dirtyID := strings.Split(s, " ")[0]
+
+	return dirtyID[2:]
 }
 
 func init() {
