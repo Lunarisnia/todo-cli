@@ -21,10 +21,15 @@ var createCmd = &cobra.Command{
 			ErrorMessage: "title is invalid",
 			Label:        "Title",
 		}
+		todoDescPc := prompt.PromptContent{
+			ErrorMessage: "description is invalid",
+			Label:        "Description",
+		}
 
-		title := prompt.PromptGetInput(todoTitlePc)
+		title := prompt.PromptGetInput(todoTitlePc, false)
+		description := prompt.PromptGetInput(todoDescPc, true)
 		fmt.Fprint(cmd.OutOrStdout(), title)
-		data.InsertTodo(title, false)
+		data.InsertTodo(title, description, false)
 		return nil
 	},
 }

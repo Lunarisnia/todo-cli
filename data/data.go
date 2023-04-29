@@ -12,8 +12,9 @@ var db *gorm.DB
 
 type Todo struct {
 	gorm.Model
-	Title  string
-	Status bool
+	Title       string
+	Description string
+	Status      bool
 }
 
 func OpenDatabase() error {
@@ -36,8 +37,8 @@ func MigrateDatabase() {
 	log.Println("Database initiated")
 }
 
-func InsertTodo(title string, status bool) {
-	todo := Todo{Title: title, Status: status}
+func InsertTodo(title string, description string, status bool) {
+	todo := Todo{Title: title, Description: description, Status: status}
 	if err := db.Create(&todo).Error; err != nil {
 		log.Fatalln(`
 ==========================

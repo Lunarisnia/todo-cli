@@ -13,9 +13,9 @@ type PromptContent struct {
 	Label        string
 }
 
-func PromptGetInput(pc PromptContent) string {
+func PromptGetInput(pc PromptContent, optional bool) string {
 	validate := func(input string) error {
-		if input == "" {
+		if !optional && (input == "") {
 			return errors.New(pc.ErrorMessage)
 		}
 		return nil
