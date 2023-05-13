@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/glebarez/sqlite"
+	"github.com/lunarisnia/todo-cli/config"
 	"gorm.io/gorm"
 )
 
@@ -18,9 +19,10 @@ type Todo struct {
 }
 
 func OpenDatabase() error {
+	config.CheckDatabaseFile()
 	var err error
 
-	db, err = gorm.Open(sqlite.Open("todo-db.db"), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open(config.DBPATH), &gorm.Config{})
 	if err != nil {
 		return err
 	}
